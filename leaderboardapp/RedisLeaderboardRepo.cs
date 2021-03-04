@@ -21,7 +21,7 @@ namespace leaderboardapp
 {
     public class RedisLeaderboardRepo : ILeaderboardRepository
     {
-        private const string REDIS_HOST_ENV = "REDIS_HOST";
+        private const string REDIS_HOST_ENV = "REDIS_SERVICE_HOST";
         private const string LEADERBOARD_KEY = "leaderboard";
         private const string DEFAULT_REDIS_HOST = "localhost";
 

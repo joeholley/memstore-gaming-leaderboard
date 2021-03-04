@@ -14,7 +14,6 @@
 using leaderboardapp.Models;
 using StackExchange.Redis;
 using System;
-using Console;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -43,7 +42,7 @@ namespace leaderboardapp
         public async Task<IList<LeaderboardItemModel>> RetrieveScoresAsync(RetrieveScoresDetails retrievalDetails)
         {
             IDatabase db = _redis.GetDatabase();
-            Console.WriteLine("Attempting to connect to redis at %s" % GetRedisHost());
+            Console.WriteLine("Attempting to connect to redis at " + GetRedisHost());
             List<LeaderboardItemModel> leaderboard = new List<LeaderboardItemModel>();
 
             long offset = retrievalDetails.Offset;
@@ -53,7 +52,7 @@ namespace leaderboardapp
             if (!string.IsNullOrWhiteSpace(retrievalDetails.CenterKey))
             {
                 // SortedSetRankAsync corresponds to ZREVRANK
-                var rank = await db.SortedSetRank(LEADERBOARD_KEY, retrievalDetails.CenterKey, Order.Descending);
+                var rank = db.SortedSetRank(LEADERBOARD_KEY, retrievalDetails.CenterKey, Order.Descending);
                 Console.WriteLine("Attempting to run ZREVRANK");
 
                 // If specified user is not present, return empty leaderboard
@@ -74,7 +73,7 @@ namespace leaderboardapp
             }
 
             // SortedSetRangeByScoreWithScoresAsync corresponds to ZREVRANGEBYSCORE [WITHSCORES]
-            var scores = await db.SortedSetRangeByScoreWithScores(LEADERBOARD_KEY,
+            var scores = db.SortedSetRangeByScoreWithScores(LEADERBOARD_KEY,
                 skip: offset,
                 take: numScores,
                 order: Order.Descending);
@@ -107,7 +106,7 @@ namespace leaderboardapp
 
             // SortedSetAddAsync corresponds to ZADD
             Console.WriteLine("Attempting to run ZADD");
-            return await db.SortedSetAdd(LEADERBOARD_KEY, score.PlayerName, score.Score);
+            return db.SortedSetAdd(LEADERBOARD_KEY, score.PlayerName, score.Score);
         }
         // [END POSTSCORE_SERVER]
 

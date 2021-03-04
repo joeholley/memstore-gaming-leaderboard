@@ -19,7 +19,7 @@ namespace leaderboardapp
 {
     public interface ILeaderboardRepository
     {
-        Task<bool> PostScoreAsync(ScoreModel score);
-        Task<IList<LeaderboardItemModel>> RetrieveScoresAsync(RetrieveScoresDetails retrievalDetails);
+        Task<bool> PostScore(ScoreModel score);
+        Task<IList<LeaderboardItemModel>> RetrieveScores(RetrieveScoresDetails retrievalDetails);
     }
 }

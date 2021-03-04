@@ -30,17 +30,18 @@ namespace leaderboardapp
 
         public RedisLeaderboardRepo()
         {
-            _redis = ConnectionMultiplexer.Connect(GetRedisHost());
+            _redis = ConnectionMultiplexer.Connect(GetRedisHost(),abortConnect=true,resolveDns=true);
         }
 
         /// <summary>
-        /// RetrieveScoresAsync
+        /// RetrieveScores
         /// </summary>
         /// <param name="retrievalDetails"></param>
         /// <returns></returns>
         // [START FETCHSCORES_SERVER]
-        public async Task<IList<LeaderboardItemModel>> RetrieveScoresAsync(RetrieveScoresDetails retrievalDetails)
+        public async Task<IList<LeaderboardItemModel>> RetrieveScores(RetrieveScoresDetails retrievalDetails)
         {
+            Console.WriteLine("in RetrieveScores");
             IDatabase db = _redis.GetDatabase();
             Console.WriteLine("Attempting to connect to redis at " + GetRedisHost());
             List<LeaderboardItemModel> leaderboard = new List<LeaderboardItemModel>();
@@ -51,9 +52,10 @@ namespace leaderboardapp
             // If centered, get rank of specified user first
             if (!string.IsNullOrWhiteSpace(retrievalDetails.CenterKey))
             {
-                // SortedSetRankAsync corresponds to ZREVRANK
-                var rank = db.SortedSetRank(LEADERBOARD_KEY, retrievalDetails.CenterKey, Order.Descending);
+                // SortedSetRankcorresponds to ZREVRANK
                 Console.WriteLine("Attempting to run ZREVRANK");
+                var rank = db.SortedSetRank(LEADERBOARD_KEY, retrievalDetails.CenterKey, Order.Descending);
+                Console.WriteLine("Done with ZREVRANK");
 
                 // If specified user is not present, return empty leaderboard
                 if (!rank.HasValue)
@@ -72,7 +74,7 @@ namespace leaderboardapp
                 }
             }
 
-            // SortedSetRangeByScoreWithScoresAsync corresponds to ZREVRANGEBYSCORE [WITHSCORES]
+            // SortedSetRangeByScoreWithScores corresponds to ZREVRANGEBYSCORE [WITHSCORES]
             var scores = db.SortedSetRangeByScoreWithScores(LEADERBOARD_KEY,
                 skip: offset,
                 take: numScores,
@@ -95,18 +97,20 @@ namespace leaderboardapp
         // [END FETCHSCORES_SERVER]
 
         /// <summary>
-        /// PostScoreAsync
+        /// PostScore
         /// </summary>
         /// <param name="score"></param>
         /// <returns></returns>
         // [START POSTSCORE_SERVER]
-        public async Task<bool> PostScoreAsync(ScoreModel score)
+        public async Task<bool> PostScore(ScoreModel score)
         {
+            Console.WriteLine("in PostScore");
             IDatabase db = _redis.GetDatabase();
 
-            // SortedSetAddAsync corresponds to ZADD
+            // SortedSetAdd corresponds to ZADD
             Console.WriteLine("Attempting to run ZADD");
             return db.SortedSetAdd(LEADERBOARD_KEY, score.PlayerName, score.Score);
+            Console.WriteLine("Done with ZADD");
         }
         // [END POSTSCORE_SERVER]
 

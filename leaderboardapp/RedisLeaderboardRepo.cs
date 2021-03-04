@@ -14,6 +14,7 @@
 using leaderboardapp.Models;
 using StackExchange.Redis;
 using System;
+using Console;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -42,6 +43,7 @@ namespace leaderboardapp
         public async Task<IList<LeaderboardItemModel>> RetrieveScoresAsync(RetrieveScoresDetails retrievalDetails)
         {
             IDatabase db = _redis.GetDatabase();
+            Console.WriteLine("Attempting to connect to redis at %s" % GetRedisHost());
             List<LeaderboardItemModel> leaderboard = new List<LeaderboardItemModel>();
 
             long offset = retrievalDetails.Offset;
@@ -51,7 +53,8 @@ namespace leaderboardapp
             if (!string.IsNullOrWhiteSpace(retrievalDetails.CenterKey))
             {
                 // SortedSetRankAsync corresponds to ZREVRANK
-                var rank = await db.SortedSetRankAsync(LEADERBOARD_KEY, retrievalDetails.CenterKey, Order.Descending);
+                var rank = await db.SortedSetRank(LEADERBOARD_KEY, retrievalDetails.CenterKey, Order.Descending);
+                Console.WriteLine("Attempting to run ZREVRANK");
 
                 // If specified user is not present, return empty leaderboard
                 if (!rank.HasValue)
@@ -71,7 +74,7 @@ namespace leaderboardapp
             }
 
             // SortedSetRangeByScoreWithScoresAsync corresponds to ZREVRANGEBYSCORE [WITHSCORES]
-            var scores = await db.SortedSetRangeByScoreWithScoresAsync(LEADERBOARD_KEY,
+            var scores = await db.SortedSetRangeByScoreWithScores(LEADERBOARD_KEY,
                 skip: offset,
                 take: numScores,
                 order: Order.Descending);
@@ -103,7 +106,8 @@ namespace leaderboardapp
             IDatabase db = _redis.GetDatabase();
 
             // SortedSetAddAsync corresponds to ZADD
-            return await db.SortedSetAddAsync(LEADERBOARD_KEY, score.PlayerName, score.Score);
+            Console.WriteLine("Attempting to run ZADD");
+            return await db.SortedSetAdd(LEADERBOARD_KEY, score.PlayerName, score.Score);
         }
         // [END POSTSCORE_SERVER]
 

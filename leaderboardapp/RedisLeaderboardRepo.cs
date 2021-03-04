@@ -30,7 +30,7 @@ namespace leaderboardapp
 
         public RedisLeaderboardRepo()
         {
-            _redis = ConnectionMultiplexer.Connect(GetRedisHost(),abortConnect=true,resolveDns=true);
+            _redis = ConnectionMultiplexer.Connect(GetRedisHost()+",abortConnect=true,resolveDns=true");
         }
 
         /// <summary>

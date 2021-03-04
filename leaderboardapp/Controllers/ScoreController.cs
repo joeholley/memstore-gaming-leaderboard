@@ -33,7 +33,7 @@ namespace leaderboardapp.Controllers
         [HttpPost]
         public async Task<JsonResult> Post([FromBody] ScoreModel model)
         {
-            await _leaderboardRepo.PostScoreAsync(model);
+            await _leaderboardRepo.PostScore(model);
 
             return Json(new { success = true } );
         }
@@ -50,7 +50,7 @@ namespace leaderboardapp.Controllers
                 NumScores = numScores
             };
 
-            var leaderboard = await _leaderboardRepo.RetrieveScoresAsync(retrievalDetails);
+            var leaderboard = await _leaderboardRepo.RetrieveScores(retrievalDetails);
 
             return Json(leaderboard);
         }
